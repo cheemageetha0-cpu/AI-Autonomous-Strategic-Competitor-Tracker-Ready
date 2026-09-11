@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        AI Autonomous Strategic Competitor Tracker
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <header class="hero">
+
+        <div class="badge">
+            AGENTIC AI • COMPETITIVE INTELLIGENCE
+        </div>
+
+        <h1>
+            🤖 AI Autonomous Strategic
+            Competitor Tracker
+        </h1>
+
+        <p>
+            Enter any business idea or category and a state.
+            The system automatically discovers competitors,
+            analyzes their development and recommends what
+            your business should change.
+        </p>
+
+    </header>
+
+
+    <!-- INPUT -->
+
+    <section class="landing-layout" aria-label="Business analysis features">
+
+        <aside class="feature-column feature-column-left">
+
+            <article class="feature-card">
+                <span class="feature-icon">&#129302;</span>
+                <h3>AI Competitor Discovery</h3>
+                <p>Find your real competitors automatically using AI.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-icon">&#128269;</span>
+                <h3>Automatic Competitor Search</h3>
+                <p>Scans the web and finds relevant competitors.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-icon">&#128202;</span>
+                <h3>Market Intelligence</h3>
+                <p>Get insights, trends and industry analysis.</p>
+            </article>
+
+        </aside>
+
+    <section class="card input-card">
+
+        <h2>
+            🔎 Analyze Your Business Idea
+        </h2>
+
+        <p class="muted">
+            Enter your business idea/category and target state.
+            Competitors do not need to be entered manually.
+        </p>
+
+
+        <div class="input-group">
+
+            <label>
+                Business Idea / Category
+            </label>
+
+            <input
+                id="businessIdea"
+                type="text"
+                placeholder="Example: AI education platform"
+            >
+
+        </div>
+
+        <div class="input-group">
+
+            <label for="aiProvider">AI analysis provider</label>
+
+            <select id="aiProvider">
+                <option value="auto">Auto — Gemini, then Groq, then local baseline</option>
+                <option value="gemini">Gemini API</option>
+                <option value="groq">Groq API</option>
+                <option value="offline">Local strategic baseline (no AI API)</option>
+            </select>
+
+            <small class="muted">Keys are read securely from the server’s .env file and are never sent to the browser.</small>
+
+        </div>
+
+
+        <div class="input-group">
+
+            <label>
+                State
+            </label>
+
+            <input
+                id="businessState"
+                type="text"
+                placeholder="Example: Telangana"
+            >
+
+        </div>
+
+
+        <div class="examples">
+
+            <span>Examples:</span>
+
+            <button onclick="fillExample(
+                'AI education platform',
+                'Telangana'
+            )">
+                AI Education
+            </button>
+
+            <button onclick="fillExample(
+                'Organic food delivery',
+                'Telangana'
+            )">
+                Food Delivery
+            </button>
+
+            <button onclick="fillExample(
+                'Electric vehicle charging',
+                'Telangana'
+            )">
+                EV Charging
+            </button>
+
+        </div>
+
+
+        <button
+            class="primary analyze-button"
+            onclick="startAnalysis()">
+
+            🚀 Analyze Market
+
+        </button>
+
+
+        <div id="loading"
+             class="loading hidden">
+
+            <div class="loading-preview" aria-live="polite">
+
+                <div class="loading-copy">
+                    <div class="spinner"></div>
+                    <div>
+                        <strong>Building your market intelligence dashboard</strong>
+                        <p>Discovering competitors, comparing capabilities, and creating recommendations. Usually under one minute.</p>
+                    </div>
+                </div>
+
+                <div class="loading-visuals" aria-hidden="true">
+                    <div class="mini-bars">
+                        <i></i><i></i><i></i><i></i><i></i>
+                    </div>
+                    <div class="mini-radar"><span></span></div>
+                    <div class="mini-progress"><span></span></div>
+                </div>
+
+                <div class="loading-steps">
+                    <span>1. Mapping market</span>
+                    <span>2. Comparing competitors</span>
+                    <span>3. Generating strategy</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="error"></div>
+
+    </section>
+
+        <aside class="feature-column feature-column-right">
+
+            <article class="feature-card">
+                <span class="feature-icon">&#11088;</span>
+                <h3>Strategic Score</h3>
+                <p>Know your position in the market.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-icon">&#127919;</span>
+                <h3>Threat Detection</h3>
+                <p>Identify potential risks and threats early.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-icon">&#128161;</span>
+                <h3>AI Recommendations</h3>
+                <p>Get actionable suggestions to stay ahead.</p>
+            </article>
+
+        </aside>
+
+    </section>
+
+
+    <!-- DASHBOARD -->
+
+    <div id="dashboard"
+         class="hidden">
+
+
+        <section class="dashboard-head">
+
+            <div>
+
+                <h2>
+                    📊 Strategic Intelligence Dashboard
+                </h2>
+
+                <p id="dashboardSubtitle"
+                   class="muted">
+                </p>
+
+            </div>
+
+            <span id="generatedAt"
+                  class="timestamp">
+            </span>
+
+        </section>
+
+
+        <!-- SUMMARY -->
+
+        <section class="summary-grid">
+
+            <div class="stat-card">
+
+                <span>
+                    Business Field
+                </span>
+
+                <strong id="field">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Your Strategic Score
+                </span>
+
+                <strong id="targetScore">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Competitor Average
+                </span>
+
+                <strong id="averageScore">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Threat Level
+                </span>
+
+                <strong id="targetThreat">
+                    -
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- SUMMARY -->
+
+        <section class="card">
+
+            <h2>
+                🧠 AI Business Analysis
+            </h2>
+
+            <p id="summary"></p>
+
+            <div class="info-box">
+
+                <b>
+                    Market Position
+                </b>
+
+                <p id="marketPosition"></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- COMPETITORS -->
+
+        <section class="card">
+
+            <h2>
+                🏆 State-Level Competitor Discovery
+            </h2>
+
+            <p class="muted">
+                Competitors automatically identified
+                for the selected business field and state.
+            </p>
+
+            <div id="competitorCards"
+                 class="competitor-grid">
+            </div>
+
+        </section>
+
+
+        <!-- COMPETITOR DEVELOPMENT -->
+
+        <section class="card">
+
+            <h2>
+                🚀 How Competitors Are Developing
+            </h2>
+
+            <div id="developmentList">
+            </div>
+
+        </section>
+
+
+        <!-- GRAPHS -->
+
+        <section class="card">
+
+            <h2>
+                📈 Illustrated Strategic Graphs
+            </h2>
+
+            <!-- GRAPH 1 -->
+
+            <div class="graph-card">
+
+                <h3>
+                    🏆 Strategic Score Comparison
+                </h3>
+
+                <div class="chart-container">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+
+                <div class="graph-explanation">
+
+                    <h4>
+                        📖 Step-by-Step Explanation
+                    </h4>
+
+                    <ol id="scoreExplanation">
+                    </ol>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRAPH 2 -->
+
+            <div class="graph-card">
+
+                <h3>
+                    🎯 Capability Radar
+                </h3>
+
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+
+                <div class="graph-explanation">
+
+                    <h4>
+                        📖 Step-by-Step Explanation
+                    </h4>
+
+                    <ol id="radarExplanation">
+                    </ol>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRAPH 3 -->
+
+            <div class="graph-card">
+
+                <h3>
+                    ⚔️ Capability Gap Analysis
+                </h3>
+
+                <div class="chart-container">
+                    <canvas id="gapChart"></canvas>
+                </div>
+
+                <div class="graph-explanation">
+
+                    <h4>
+                        📖 Step-by-Step Explanation
+                    </h4>
+
+                    <ol id="gapExplanation">
+                    </ol>
+
+                </div>
+
+            </div>
+
+            <!-- GRAPH 4 -->
+
+            <div class="graph-card">
+
+                <h3>Competitive Strength Mix</h3>
+
+                <div class="chart-container chart-container-small">
+                    <canvas id="strengthMixChart"></canvas>
+                </div>
+
+                <div class="graph-explanation">
+
+                    <h4>Step-by-Step Explanation</h4>
+
+                    <ol id="strengthMixExplanation">
+                    </ol>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ADVANCED VISUALIZATIONS: existing dashboard sections remain unchanged -->
+
+        <button id="toggleDetails" class="details-toggle" type="button" onclick="toggleDetails()">
+            Show detailed insights and advanced graphs
+        </button>
+
+        <section class="card advanced-visualizations">
+
+            <h2>Advanced Competitive Visualizations</h2>
+
+            <p class="muted">
+                Additional interactive views built from the same competitor analysis data.
+            </p>
+
+            <div class="advanced-graph-grid">
+
+                <div class="graph-card">
+                    <h3>Strategic Ranking</h3>
+                    <div class="chart-container"><canvas id="rankingChart"></canvas></div>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="rankingExplanation"></ol></div>
+                </div>
+
+                <div class="graph-card">
+                    <h3>Threat Distribution</h3>
+                    <div class="chart-container"><canvas id="threatDistributionChart"></canvas></div>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="threatDistributionExplanation"></ol></div>
+                </div>
+
+                <div class="graph-card">
+                    <h3>Strategic Trend</h3>
+                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="trendExplanation"></ol></div>
+                </div>
+
+                <div class="graph-card">
+                    <h3>Competitive Positioning</h3>
+                    <div class="chart-container"><canvas id="positioningChart"></canvas></div>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="positioningExplanation"></ol></div>
+                </div>
+
+                <div class="graph-card">
+                    <h3>Overall Threat Score</h3>
+                    <div class="chart-container chart-container-small"><canvas id="threatGaugeChart"></canvas></div>
+                    <p id="threatGaugeLabel" class="gauge-label"></p>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="gaugeExplanation"></ol></div>
+                </div>
+
+                <div class="graph-card">
+                    <h3>Technology & Capability Gaps</h3>
+                    <div id="technologyHeatmap" class="technology-heatmap" aria-label="Technology and capability gap heatmap"></div>
+                    <div class="heatmap-legend"><span>Low gap</span><span>High gap</span></div>
+                    <div class="graph-explanation"><h4>Step-by-Step Explanation</h4><ol id="heatmapExplanation"></ol></div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- SIGNALS -->
+
+        <section class="card">
+
+            <h2>
+                🚨 Strategic Signals & Alerts
+            </h2>
+
+            <div id="signalsList">
+            </div>
+
+        </section>
+
+
+        <!-- WHY BETTER -->
+
+        <section class="card">
+
+            <h2>
+                ⚔️ Why Competitors Are Better
+            </h2>
+
+            <div id="advantagesList">
+            </div>
+
+        </section>
+
+
+        <!-- THREATS -->
+
+        <section class="card">
+
+            <h2>
+                🔥 Threats
+            </h2>
+
+            <div id="threatsList">
+            </div>
+
+        </section>
+
+
+        <!-- OPPORTUNITIES -->
+
+        <section class="card">
+
+            <h2>
+                💡 Opportunities
+            </h2>
+
+            <div id="opportunitiesList">
+            </div>
+
+        </section>
+
+
+        <!-- RECOMMENDATIONS -->
+
+        <section class="card recommendations-card">
+
+            <h2>
+                🤖 What Should You Change?
+            </h2>
+
+            <p class="muted">
+                Automatically generated strategic
+                recommendations based on competitor gaps.
+            </p>
+
+            <div id="recommendationsList">
+            </div>
+
+        </section>
+
+
+        <!-- SWOT -->
+
+        <section class="card">
+
+            <h2>
+                🧩 SWOT Analysis
+            </h2>
+
+            <div class="swot-grid">
+
+                <div class="swot strength">
+
+                    <h3>
+                        💪 Strengths
+                    </h3>
+
+                    <ul id="strengths">
+                    </ul>
+
+                </div>
+
+
+                <div class="swot weakness">
+
+                    <h3>
+                        ⚠️ Weaknesses
+                    </h3>
+
+                    <ul id="weaknesses">
+                    </ul>
+
+                </div>
+
+
+                <div class="swot opportunity">
+
+                    <h3>
+                        💡 Opportunities
+                    </h3>
+
+                    <ul id="swotOpportunities">
+                    </ul>
+
+                </div>
+
+
+                <div class="swot threat-box">
+
+                    <h3>
+                        🔥 Threats
+                    </h3>
+
+                    <ul id="swotThreats">
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PDF -->
+
+        <section class="card report-card">
+
+            <h2>
+                📄 Strategic Report
+            </h2>
+
+            <p>
+                Download the complete competitor analysis,
+                recommendations and SWOT report.
+            </p>
+
+            <button
+                class="secondary"
+                onclick="downloadReport()">
+
+                📥 Download PDF Report
+
+            </button>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let analysisData = null;
+
+let scoreChart = null;
+let radarChart = null;
+let gapChart = null;
+let strengthMixChart = null;
+let rankingChart = null;
+let threatDistributionChart = null;
+let trendChart = null;
+let positioningChart = null;
+let threatGaugeChart = null;
+
+
+function fillExample(idea, state) {
+
+    document.getElementById(
+        "businessIdea"
+    ).value = idea;
+
+    document.getElementById(
+        "businessState"
+    ).value = state;
+
+}
+
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/[&<>"']/g, function(char) {
+
+            const map = {
+
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+
+            };
+
+            return map[char];
+
+        });
+
+}
+
+
+async function startAnalysis() {
+
+    const idea =
+        document.getElementById(
+            "businessIdea"
+        ).value.trim();
+
+    const state =
+        document.getElementById(
+            "businessState"
+        ).value.trim();
+
+    const provider = "auto";
+
+
+    if (!idea) {
+
+        showError(
+            "Please enter a business idea or category."
+        );
+
+        return;
+
+    }
+
+
+    if (!state) {
+
+        showError(
+            "Please enter a state."
+        );
+
+        return;
+
+    }
+
+
+    document.getElementById(
+        "loading"
+    ).classList.remove("hidden");
+
+    document.getElementById(
+        "dashboard"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "error"
+    ).innerHTML = "";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/analyze",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        idea: idea,
+                        state: state,
+                        provider: provider
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "Analysis failed."
+            );
+
+        }
+
+
+        analysisData = data;
+
+        renderDashboard(data);
+
+
+    } catch (error) {
+
+        showError(
+            "⚠️ " + error.message
+        );
+
+    } finally {
+
+        document.getElementById(
+            "loading"
+        ).classList.add("hidden");
+
+    }
+
+}
+
+
+function showError(message) {
+
+    document.getElementById(
+        "error"
+    ).innerHTML =
+        `<div class="error">${escapeHtml(message)}</div>`;
+
+}
+
+
+function renderDashboard(data) {
+
+    configurePresentationMode();
+
+    document.getElementById(
+        "dashboard"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+        "dashboardSubtitle"
+    ).textContent =
+        `${data.business_idea} • ${data.state}`;
+
+
+    document.getElementById(
+        "generatedAt"
+    ).textContent =
+        data.generated_at;
+
+    document.getElementById("generatedAt").textContent =
+        `${data.generated_at} | ${data.analysis_provider || "Local strategic baseline"}`;
+
+
+    document.getElementById(
+        "field"
+    ).textContent =
+        data.field;
+
+
+    document.getElementById(
+        "targetScore"
+    ).textContent =
+        data.target_score + "/100";
+
+
+    document.getElementById(
+        "averageScore"
+    ).textContent =
+        data.competitor_average + "/100";
+
+
+    document.getElementById(
+        "targetThreat"
+    ).textContent =
+        data.target_threat;
+
+
+    document.getElementById(
+        "summary"
+    ).textContent =
+        data.summary;
+
+
+    document.getElementById(
+        "marketPosition"
+    ).textContent =
+        data.market_position;
+
+
+    renderCompetitors(
+        data.competitors
+    );
+
+
+    renderDevelopment(
+        data.development
+    );
+
+
+    renderSignals(
+        data.signals
+    );
+
+
+    renderAdvantages(
+        data.competitors
+    );
+
+
+    renderItems(
+        "threatsList",
+        data.threats
+    );
+
+
+    renderItems(
+        "opportunitiesList",
+        data.opportunities
+    );
+
+
+    renderRecommendations(
+        data.recommendations
+    );
+
+
+    renderSWOT(
+        data.swot
+    );
+
+
+    renderCharts(
+        data
+    );
+
+
+    renderExplanations(
+        data.graph_explanations
+    );
+
+    renderAdvancedGraphs(data);
+
+}
+
+
+function configurePresentationMode() {
+
+    [
+        "developmentList",
+        "signalsList",
+        "advantagesList",
+        "threatsList",
+        "opportunitiesList",
+        "recommendationsList",
+        "strengths"
+    ].forEach(id => {
+        const section = document.getElementById(id)?.closest("section");
+        if (section && !section.dataset.presentationSetup) {
+            section.classList.add("detail-section", "is-collapsed");
+            section.dataset.presentationSetup = "true";
+        }
+    });
+
+    const advancedSection = document.querySelector(".advanced-visualizations");
+    if (advancedSection && !advancedSection.dataset.presentationSetup) {
+        advancedSection.classList.add("detail-section", "is-collapsed");
+        advancedSection.dataset.presentationSetup = "true";
+    }
+}
+
+
+function toggleDetails() {
+
+    const sections = document.querySelectorAll(".detail-section");
+    const isOpening = [...sections].some(section => section.classList.contains("is-collapsed"));
+
+    sections.forEach(section => section.classList.toggle("is-collapsed", !isOpening));
+
+    const button = document.getElementById("toggleDetails");
+    button.textContent = isOpening
+        ? "Hide detailed insights and advanced graphs"
+        : "Show detailed insights and advanced graphs";
+
+    if (isOpening) button.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+
+function renderCompetitors(competitors) {
+
+    const container =
+        document.getElementById(
+            "competitorCards"
+        );
+
+    container.innerHTML = "";
+
+
+    competitors.forEach(
+        function(item, index) {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+            card.className =
+                "competitor-mini-card";
+
+
+            card.innerHTML = `
+
+                <div class="rank">
+                    <span>Rank</span>
+                    <strong>${index + 1}</strong>
+                </div>
+
+                <h3>
+                    ${escapeHtml(item.name)}
+                </h3>
+
+                <p>
+                    📍 ${escapeHtml(item.state)}
+                </p>
+
+                <div class="score">
+                    Strategic Score:
+                    <strong>
+                        ${item.strategic_score}/100
+                    </strong>
+                    <div class="score-meter"><span style="width:${Math.max(0, Math.min(100, item.strategic_score))}%"></span></div>
+                </div>
+
+                <span class="threat ${item.threat_level.toLowerCase()}">
+                    ${item.threat_level}
+                </span>
+
+                <p>
+                    <b>Why relevant:</b>
+                    ${escapeHtml(
+                        item.signals.join(", ")
+                    )}
+                </p>
+
+            `;
+
+            container.appendChild(card);
+
+        }
+    );
+
+}
+
+
+function renderDevelopment(items) {
+
+    const container =
+        document.getElementById(
+            "developmentList"
+        );
+
+    container.innerHTML = "";
+
+
+    items.forEach(
+        function(item) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "development-item";
+
+
+            div.innerHTML = `
+
+                <h3>
+                    🚀 ${escapeHtml(item.competitor)}
+                </h3>
+
+                <p>
+                    ${escapeHtml(item.development)}
+                </p>
+
+                <div class="chips">
+
+                    ${item.signals.map(
+                        signal =>
+                        `<span>${escapeHtml(signal)}</span>`
+                    ).join("")}
+
+                </div>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+function renderSignals(items) {
+
+    const container =
+        document.getElementById(
+            "signalsList"
+        );
+
+    container.innerHTML = "";
+
+
+    items.forEach(
+        function(item) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "signal-item";
+
+
+            div.innerHTML = `
+
+                <b>
+                    ${escapeHtml(item.type)}
+                </b>
+
+                <span>
+                    ${escapeHtml(item.competitor)}
+                </span>
+
+                <p>
+                    ${escapeHtml(item.detail)}
+                </p>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+function renderAdvantages(competitors) {
+
+    const container =
+        document.getElementById(
+            "advantagesList"
+        );
+
+    container.innerHTML = "";
+
+
+    competitors.forEach(
+        function(item) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "advantage-item";
+
+
+            div.innerHTML = `
+
+                <h3>
+                    ${escapeHtml(item.name)}
+                </h3>
+
+                <p>
+                    <b>What they are doing better:</b>
+                    ${escapeHtml(
+                        item.signals.join(", ")
+                    )}
+                </p>
+
+                <p>
+                    <b>What you should study:</b>
+                    competitor development,
+                    customer experience,
+                    technology and pricing.
+                </p>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+function renderItems(
+    elementId,
+    items
+) {
+
+    const container =
+        document.getElementById(
+            elementId
+        );
+
+    container.innerHTML = "";
+
+
+    items.forEach(
+        function(item) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "list-item";
+
+
+            div.innerHTML = `
+
+                <h3>
+                    ${escapeHtml(item.title)}
+                </h3>
+
+                <p>
+                    ${escapeHtml(item.detail)}
+                </p>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+function renderRecommendations(items) {
+
+    const container =
+        document.getElementById(
+            "recommendationsList"
+        );
+
+    container.innerHTML = "";
+
+
+    items.forEach(
+        function(item, index) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "recommendation-item";
+
+
+            div.innerHTML = `
+
+                <div class="recommendation-number">
+                    ${index + 1}
+                </div>
+
+                <div>
+
+                    <h3>
+                        ${escapeHtml(item.title)}
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(item.reason)}
+                    </p>
+
+                    <span class="priority">
+                        ${escapeHtml(item.priority)}
+                    </span>
+
+                </div>
+
+            `;
+
+            container.appendChild(div);
+
+        }
+    );
+
+}
+
+
+function renderSWOT(swot) {
+
+    fillList(
+        "strengths",
+        swot.strengths
+    );
+
+    fillList(
+        "weaknesses",
+        swot.weaknesses
+    );
+
+    fillList(
+        "swotOpportunities",
+        swot.opportunities
+    );
+
+    fillList(
+        "swotThreats",
+        swot.threats
+    );
+
+}
+
+
+function fillList(
+    id,
+    items
+) {
+
+    const element =
+        document.getElementById(id);
+
+    element.innerHTML = "";
+
+
+    items.forEach(
+        function(item) {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+            li.textContent = item;
+
+            element.appendChild(li);
+
+        }
+    );
+
+}
+
+
+function renderCharts(data) {
+
+    const labels =
+        data.competitors.map(
+            item => item.name
+        );
+
+
+    const scores =
+        data.competitors.map(
+            item => item.strategic_score
+        );
+
+
+    if (scoreChart)
+        scoreChart.destroy();
+
+
+    scoreChart =
+        new Chart(
+            document.getElementById(
+                "scoreChart"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: [
+                        "Your Business",
+                        ...labels
+                    ],
+
+                    datasets: [{
+
+                        label:
+                            "Strategic Score",
+
+                        data: [
+                            data.target_score,
+                            ...scores
+                        ],
+
+                        borderWidth: 2,
+
+                        borderRadius: 8
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    animation: {
+                        duration: 1200
+                    },
+
+                    scales: {
+
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    const target =
+        data.target_capabilities;
+
+
+    const competitor =
+        data.competitor_capabilities;
+
+
+    if (radarChart)
+        radarChart.destroy();
+
+
+    radarChart =
+        new Chart(
+            document.getElementById(
+                "radarChart"
+            ),
+            {
+
+                type: "radar",
+
+                data: {
+
+                    labels: [
+                        "Innovation",
+                        "Market",
+                        "Digital",
+                        "Customer"
+                    ],
+
+                    datasets: [
+
+                        {
+                            label:
+                                "Your Business",
+
+                            data: [
+                                target.innovation,
+                                target.market,
+                                target.digital,
+                                target.customer
+                            ],
+
+                            borderWidth: 3
+                        },
+
+                        {
+                            label:
+                                "Competitor Average",
+
+                            data: [
+                                competitor.innovation,
+                                competitor.market,
+                                competitor.digital,
+                                competitor.customer
+                            ],
+
+                            borderWidth: 3
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        r: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+
+    if (gapChart)
+        gapChart.destroy();
+
+
+    const gap =
+        data.capability_gap;
+
+
+    gapChart =
+        new Chart(
+            document.getElementById(
+                "gapChart"
+            ),
+            {
+
+                type: "bar",
+
+                data: {
+
+                    labels: [
+                        "Innovation",
+                        "Market",
+                        "Digital",
+                        "Customer"
+                    ],
+
+                    datasets: [{
+
+                        label:
+                            "Competitor Advantage Gap",
+
+                        data: [
+                            gap.innovation,
+                            gap.market,
+                            gap.digital,
+                            gap.customer
+                        ],
+
+                        borderWidth: 2,
+
+                        borderRadius: 8
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    scales: {
+
+                        y: {
+                            beginAtZero: true
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    if (strengthMixChart)
+        strengthMixChart.destroy();
+
+    const strengths = [
+        competitor.innovation,
+        competitor.market,
+        competitor.digital,
+        competitor.customer
+    ];
+
+    strengthMixChart = new Chart(
+        document.getElementById("strengthMixChart"),
+        {
+            type: "doughnut",
+            data: {
+                labels: ["Innovation", "Market Reach", "Digital", "Customer Experience"],
+                datasets: [{
+                    data: strengths,
+                    backgroundColor: ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899"],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: { callbacks: { label: context => `${context.label}: ${context.raw}/100` } }
+                }
+            }
+        }
+    );
+
+}
+
+
+function renderExplanations(
+    explanations
+) {
+
+    fillExplanation(
+        "scoreExplanation",
+        explanations.strategic_score
+    );
+
+    fillExplanation(
+        "radarExplanation",
+        explanations.radar
+    );
+
+    fillExplanation(
+        "gapExplanation",
+        explanations.gap
+    );
+
+    fillExplanation(
+        "strengthMixExplanation",
+        [
+            "Step 1: Each segment shows the competitor benchmark for one capability.",
+            "Step 2: Larger segments identify the capabilities competitors rely on most.",
+            "Step 3: Compare the biggest segments with your lower radar-chart values.",
+            "Step 4: Use the capability-gap chart to decide which improvement to implement first."
+        ]
+    );
+
+}
+
+
+function fillExplanation(
+    id,
+    items
+) {
+
+    const list =
+        document.getElementById(id);
+
+    list.innerHTML = "";
+
+
+    items.forEach(
+        function(item) {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+            li.textContent = item;
+
+            list.appendChild(li);
+
+        }
+    );
+
+}
+
+
+function renderAdvancedGraphs(data) {
+
+    const competitors = data.competitors || [];
+    const labels = ["Your Business", ...competitors.map(item => item.name)];
+    const scores = [data.target_score, ...competitors.map(item => item.strategic_score)];
+    const colors = scores.map((_, index) => index === 0 ? "#4f46e5" : "#14b8a6");
+
+    if (rankingChart) rankingChart.destroy();
+    rankingChart = new Chart(document.getElementById("rankingChart"), {
+        type: "bar",
+        data: { labels, datasets: [{ label: "Strategic Score", data: scores, backgroundColor: colors, borderRadius: 7 }] },
+        options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+
+    const threatCounts = { HIGH: 0, MEDIUM: 0, LOW: 0 };
+    competitors.forEach(item => { threatCounts[item.threat_level] = (threatCounts[item.threat_level] || 0) + 1; });
+    if (threatDistributionChart) threatDistributionChart.destroy();
+    threatDistributionChart = new Chart(document.getElementById("threatDistributionChart"), {
+        type: "doughnut",
+        data: { labels: ["High", "Medium", "Low"], datasets: [{ data: [threatCounts.HIGH, threatCounts.MEDIUM, threatCounts.LOW], backgroundColor: ["#ef4444", "#f59e0b", "#22c55e"], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+    });
+
+    // This is a planning projection derived from current score and gaps, not historical market data.
+    const gapAverage = Object.values(data.capability_gap || {}).reduce((total, value) => total + Number(value || 0), 0) / 4;
+    const current = Number(data.target_score || 0);
+    const projected = Math.min(100, Math.round(current + Math.max(8, gapAverage * 1.5)));
+    if (trendChart) trendChart.destroy();
+    trendChart = new Chart(document.getElementById("trendChart"), {
+        type: "line",
+        data: { labels: ["Now", "30 days", "60 days", "90 days"], datasets: [{ label: "Your projected strategic score", data: [current, Math.round(current + (projected - current) * .32), Math.round(current + (projected - current) * .68), projected], borderColor: "#4f46e5", backgroundColor: "rgba(79,70,229,.14)", fill: true, tension: .35, pointBackgroundColor: "#4f46e5" }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+    });
+
+    const positionData = [{ x: data.target_capabilities.market, y: data.target_capabilities.innovation, r: 11, label: "Your Business" }];
+    competitors.forEach(item => positionData.push({ x: item.capabilities.market, y: item.capabilities.innovation, r: 8, label: item.name }));
+    if (positioningChart) positioningChart.destroy();
+    positioningChart = new Chart(document.getElementById("positioningChart"), {
+        type: "scatter",
+        data: { datasets: [{ label: "Businesses", data: positionData, pointRadius: positionData.map((_, index) => index ? 8 : 11), backgroundColor: positionData.map((_, index) => index ? "rgba(20,184,166,.65)" : "rgba(79,70,229,.85)") }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { min: 0, max: 100, title: { display: true, text: "Market Reach" } }, y: { min: 0, max: 100, title: { display: true, text: "Innovation" } } }, plugins: { tooltip: { callbacks: { label: context => `${context.raw.label}: market ${context.raw.x}, innovation ${context.raw.y}` } } } }
+    });
+
+    const threatScore = Math.max(0, Math.min(100, Math.round((Number(data.competitor_average || 0) - current + 30) * 1.65)));
+    if (threatGaugeChart) threatGaugeChart.destroy();
+    threatGaugeChart = new Chart(document.getElementById("threatGaugeChart"), {
+        type: "doughnut",
+        data: { datasets: [{ data: [threatScore, 100 - threatScore], backgroundColor: [threatScore >= 67 ? "#ef4444" : threatScore >= 40 ? "#f59e0b" : "#22c55e", "#e2e8f0"], borderWidth: 0, circumference: 180, rotation: 270 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: "72%", plugins: { legend: { display: false }, tooltip: { enabled: false } } }
+    });
+    document.getElementById("threatGaugeLabel").textContent = `${threatScore}/100 — ${threatScore >= 67 ? "High" : threatScore >= 40 ? "Medium" : "Low"} competitive pressure`;
+
+    const heatmap = document.getElementById("technologyHeatmap");
+    const gap = data.capability_gap || {};
+    heatmap.innerHTML = Object.entries(gap).map(([name, value]) => {
+        const gapValue = Math.max(0, Math.min(100, Number(value || 0) * 5));
+        return `<div class="heatmap-cell" style="--gap:${gapValue}%"><strong>${escapeHtml(name)}</strong><span>${escapeHtml(value)} point gap</span></div>`;
+    }).join("");
+
+    fillExplanation("rankingExplanation", ["Step 1: Your business is shown alongside every discovered competitor.", "Step 2: Longer horizontal bars indicate a stronger strategic score.", "Step 3: Find the nearest competitor above your score.", "Step 4: Use the recommendations to close the gap in a focused way."]);
+    fillExplanation("threatDistributionExplanation", ["Step 1: Competitors are grouped by their calculated threat level.", "Step 2: Red represents high pressure, amber medium pressure, and green low pressure.", "Step 3: More red segments mean the market needs sharper differentiation.", "Step 4: Study high-threat competitors before choosing pricing and launch tactics."]);
+    fillExplanation("trendExplanation", ["Step 1: The first point is your current strategic score.", "Step 2: Later points are a planning projection, not historical market data.", "Step 3: The projection assumes you act on the identified capability gaps.", "Step 4: Review this target every month using updated competitor research."]);
+    fillExplanation("positioningExplanation", ["Step 1: Each bubble represents your business or a competitor.", "Step 2: Moving right means stronger market reach; moving up means more innovation.", "Step 3: Your ideal position is toward the top-right of the chart.", "Step 4: Choose one axis to improve first rather than attempting every change at once."]);
+    fillExplanation("gaugeExplanation", ["Step 1: The gauge converts score difference into a simple competitive-pressure indicator.", "Step 2: Green is low, amber is medium, and red is high pressure.", "Step 3: A higher score means competitors have a larger combined advantage today.", "Step 4: Reduce the score by improving the highest capability gaps."]);
+    fillExplanation("heatmapExplanation", ["Step 1: Each cell represents a capability where competitors may be ahead.", "Step 2: Darker colour means a larger current gap.", "Step 3: Start with the darkest cell that matters to your target customer.", "Step 4: Turn that gap into one measurable 30-day improvement task."]);
+}
+
+
+async function downloadReport() {
+
+    if (!analysisData) {
+
+        alert(
+            "Please complete the analysis first."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/report",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            analysisData
+                        )
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const error =
+                await response.json();
+
+            throw new Error(
+                error.error ||
+                "PDF generation failed."
+            );
+
+        }
+
+
+        const blob =
+            await response.blob();
+
+
+        const url =
+            window.URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href = url;
+
+        link.download =
+            "AI_Strategic_Competitor_Report.pdf";
+
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+
+        window.URL.revokeObjectURL(
+            url
+        );
+
+
+    } catch (error) {
+
+        alert(
+            "PDF Error: " +
+            error.message
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
