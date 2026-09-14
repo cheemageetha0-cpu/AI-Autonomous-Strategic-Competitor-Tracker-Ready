@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Strategic Competitor Analysis</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="analysis-page">
+
+    <!-- HEADER -->
+    <header class="analysis-header">
+
+        <div>
+            <div class="eyebrow">AI AUTONOMOUS STRATEGIC ANALYSIS</div>
+
+            <h1>Competitor Intelligence Dashboard</h1>
+
+            <p>
+                AI-powered analysis of competitors, strategic strengths,
+                market gaps and improvement opportunities.
+            </p>
+        </div>
+
+        <div class="header-actions">
+
+            <button class="dashboard-btn"
+                    onclick="window.location.href='/'">
+                ← New Analysis
+            </button>
+
+            <button class="pdf-btn"
+                    onclick="downloadPDF()">
+                📄 Download PDF
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- SUMMARY -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-icon">🏢</div>
+
+            <div>
+                <span class="summary-label">Business</span>
+
+                <h2 id="businessName">
+                    Business
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">📍</div>
+
+            <div>
+                <span class="summary-label">Market</span>
+
+                <h2 id="marketState">
+                    State
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">👥</div>
+
+            <div>
+                <span class="summary-label">Competitors Found</span>
+
+                <h2 id="competitorCount">
+                    0
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">⭐</div>
+
+            <div>
+                <span class="summary-label">Strategic Score</span>
+
+                <h2 id="strategicScore">
+                    0/10
+                </h2>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- THREAT -->
+    <section class="threat-card">
+
+        <div>
+
+            <span class="section-small-title">
+                STRATEGIC THREAT LEVEL
+            </span>
+
+            <h2 id="threatLevel">
+                Calculating...
+            </h2>
+
+            <p id="threatExplanation">
+                AI is evaluating the competitive environment.
+            </p>
+
+        </div>
+
+        <div class="threat-meter">
+
+            <div class="meter-background">
+
+                <div id="threatProgress"
+                     class="meter-progress">
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- COMPETITOR CARDS -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+                <span class="section-small-title">
+                    COMPETITOR LANDSCAPE
+                </span>
+
+                <h2>Discovered Competitors</h2>
+
+                <p>
+                    Businesses identified by the autonomous analysis system.
+                </p>
+            </div>
+
+        </div>
+
+        <div id="competitorContainer"
+             class="competitor-grid">
+        </div>
+
+    </section>
+
+
+    <!-- GRAPH 1 -->
+    <section class="visual-section">
+
+        <div class="visual-heading">
+
+            <div class="visual-number">01</div>
+
+            <div>
+
+                <span class="section-small-title">
+                    STRATEGIC POSITION
+                </span>
+
+                <h2>🏆 Strategic Strength Comparison</h2>
+
+                <p>
+                    Compare the strategic strength of your business
+                    against the discovered competitors.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+
+                    <h3>Competitive strength score</h3>
+
+                    <p>
+                        Higher scores indicate stronger strategic positioning.
+                    </p>
+
+                </div>
+
+                <span class="live-badge">
+                    ● LIVE ANALYSIS
+                </span>
+
+            </div>
+
+
+            <div class="large-chart">
+                <canvas id="scoreChart"></canvas>
+            </div>
+
+
+            <div class="graph-explanation">
+
+                <h3>🔍 Step-by-step explanation</h3>
+
+                <div class="steps">
+
+                    <div class="step">
+
+                        <span>1</span>
+
+                        <div>
+                            <strong>Identify the businesses</strong>
+
+                            <p>
+                                The horizontal axis contains your business
+                                and the competitors discovered by the AI.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>2</span>
+
+                        <div>
+                            <strong>Read the score</strong>
+
+                            <p>
+                                Each bar represents a strategic score
+                                from 0 to 10. A taller bar means stronger
+                                strategic positioning.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>3</span>
+
+                        <div>
+                            <strong>Compare your position</strong>
+
+                            <p id="scoreStep3">
+                                Compare your business score with the
+                                competitor average.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>4</span>
+
+                        <div>
+                            <strong>Find the strategic gap</strong>
+
+                            <p id="scoreStep4">
+                                A lower score indicates areas where your
+                                business may need improvement.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>5</span>
+
+                        <div>
+                            <strong>Take action</strong>
+
+                            <p>
+                                Use the recommendations below the dashboard
+                                to improve the weakest strategic areas.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- GRAPH 2 -->
+    <section class="visual-section">
+
+        <div class="visual-heading">
+
+            <div class="visual-number">02</div>
+
+            <div>
+
+                <span class="section-small-title">
+                    BUSINESS CAPABILITIES
+                </span>
+
+                <h2>🎯 Capability Radar</h2>
+
+                <p>
+                    A multi-dimensional view of your capabilities compared
+                    with the average competitor.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+
+                    <h3>Capability comparison</h3>
+
+                    <p>
+                        Larger radar coverage means stronger capability
+                        across the selected dimensions.
+                    </p>
+
+                </div>
+
+                <span class="analysis-badge">
+                    AI GENERATED
+                </span>
+
+            </div>
+
+
+            <div class="radar-layout">
+
+                <div class="radar-chart-container">
+
+                    <canvas id="radarChart"></canvas>
+
+                </div>
+
+
+                <div class="radar-summary">
+
+                    <h3>Capability overview</h3>
+
+                    <div id="capabilityList">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="graph-explanation">
+
+                <h3>🔍 Step-by-step explanation</h3>
+
+                <div class="steps">
+
+                    <div class="step">
+
+                        <span>1</span>
+
+                        <div>
+                            <strong>Understand the dimensions</strong>
+
+                            <p>
+                                Each section of the radar represents
+                                one business capability such as technology,
+                                customer experience, innovation or pricing.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>2</span>
+
+                        <div>
+                            <strong>Read the distance from the centre</strong>
+
+                            <p>
+                                A value closer to the outer edge means
+                                stronger capability. A value closer to
+                                the centre means weaker capability.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>3</span>
+
+                        <div>
+                            <strong>Compare both shapes</strong>
+
+                            <p>
+                                The target business and competitor average
+                                are displayed separately so their strengths
+                                can be compared visually.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>4</span>
+
+                        <div>
+                            <strong>Locate weaker capabilities</strong>
+
+                            <p id="radarStep4">
+                                Look for dimensions where the competitor
+                                average extends farther than your business.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>5</span>
+
+                        <div>
+                            <strong>Convert the gap into improvements</strong>
+
+                            <p>
+                                The capability gaps are translated into
+                                practical recommendations in the sections
+                                below.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- GRAPH 3 -->
+    <section class="visual-section">
+
+        <div class="visual-heading">
+
+            <div class="visual-number">03</div>
+
+            <div>
+
+                <span class="section-small-title">
+                    IMPROVEMENT PRIORITIES
+                </span>
+
+                <h2>📉 Capability Gap Analysis</h2>
+
+                <p>
+                    See exactly where your business is behind the
+                    competitor benchmark.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <div>
+
+                    <h3>Business improvement gaps</h3>
+
+                    <p>
+                        Positive values show areas where competitors
+                        have an advantage.
+                    </p>
+
+                </div>
+
+                <span class="priority-badge">
+                    ACTION PRIORITIES
+                </span>
+
+            </div>
+
+
+            <div class="large-chart gap-chart">
+                <canvas id="gapChart"></canvas>
+            </div>
+
+
+            <div id="gapPriorityCards"
+                 class="gap-priority-grid">
+            </div>
+
+
+            <div class="graph-explanation">
+
+                <h3>🔍 Step-by-step explanation</h3>
+
+                <div class="steps">
+
+                    <div class="step">
+
+                        <span>1</span>
+
+                        <div>
+
+                            <strong>Calculate the benchmark</strong>
+
+                            <p>
+                                The system calculates the average capability
+                                level of the discovered competitors.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>2</span>
+
+                        <div>
+
+                            <strong>Compare your business</strong>
+
+                            <p>
+                                Your capability score is compared against
+                                the competitor benchmark for each category.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>3</span>
+
+                        <div>
+
+                            <strong>Understand the gap</strong>
+
+                            <p>
+                                A larger positive gap means competitors
+                                are stronger in that capability.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>4</span>
+
+                        <div>
+
+                            <strong>Prioritize improvements</strong>
+
+                            <p id="gapStep4">
+                                The largest gaps should normally receive
+                                the highest improvement priority.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="step">
+
+                        <span>5</span>
+
+                        <div>
+
+                            <strong>Apply the recommendations</strong>
+
+                            <p>
+                                Use the AI recommendations to decide
+                                which changes should be implemented first.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- STRATEGIC SIGNALS -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    MARKET INTELLIGENCE
+                </span>
+
+                <h2>⚡ Strategic Signals</h2>
+
+                <p>
+                    Important developments detected during competitor research.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div id="signalsContainer"
+             class="signal-grid">
+        </div>
+
+    </section>
+
+
+    <!-- WHY COMPETITORS ARE BETTER -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    COMPETITIVE ADVANTAGE
+                </span>
+
+                <h2>💡 Why Competitors Are Stronger</h2>
+
+            </div>
+
+        </div>
+
+        <div id="advantagesContainer"
+             class="info-grid">
+        </div>
+
+    </section>
+
+
+    <!-- DEVELOPMENTS -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    RECENT DEVELOPMENT
+                </span>
+
+                <h2>🚀 Competitor Developments</h2>
+
+            </div>
+
+        </div>
+
+        <div id="developmentContainer"
+             class="development-grid">
+        </div>
+
+    </section>
+
+
+    <!-- THREATS -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    RISK ANALYSIS
+                </span>
+
+                <h2>⚠️ Competitive Threats</h2>
+
+            </div>
+
+        </div>
+
+        <div id="threatContainer"
+             class="list-card">
+        </div>
+
+    </section>
+
+
+    <!-- OPPORTUNITIES -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    GROWTH
+                </span>
+
+                <h2>🌱 Opportunities</h2>
+
+            </div>
+
+        </div>
+
+        <div id="opportunityContainer"
+             class="list-card">
+        </div>
+
+    </section>
+
+
+    <!-- MARKET GAP DETECTOR -->
+    <section class="section-block market-gap-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    MARKET INTELLIGENCE
+                </span>
+
+                <h2>🧠 Market Gap Detector</h2>
+
+                <p>
+                    Opportunities identified from the services and capabilities
+                    missing or weak across the discovered competitors.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div id="marketGapContainer"
+             class="market-gap-grid">
+        </div>
+
+    </section>
+
+
+    <!-- RECOMMENDATIONS -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    AI STRATEGY
+                </span>
+
+                <h2>🧠 Recommended Changes</h2>
+
+                <p>
+                    Practical improvements generated from the competitor analysis.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div id="recommendationContainer"
+             class="recommendation-grid">
+        </div>
+
+    </section>
+
+
+    <!-- SWOT -->
+    <section class="section-block">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-small-title">
+                    SWOT ANALYSIS
+                </span>
+
+                <h2>📊 Strategic SWOT</h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="swot-grid">
+
+            <div class="swot-card strength-card">
+
+                <h3>💪 Strengths</h3>
+
+                <ul id="strengthList"></ul>
+
+            </div>
+
+
+            <div class="swot-card weakness-card">
+
+                <h3>🔧 Weaknesses</h3>
+
+                <ul id="weaknessList"></ul>
+
+            </div>
+
+
+            <div class="swot-card opportunity-card">
+
+                <h3>🌱 Opportunities</h3>
+
+                <ul id="swotOpportunityList"></ul>
+
+            </div>
+
+
+            <div class="swot-card threat-swot-card">
+
+                <h3>⚠️ Threats</h3>
+
+                <ul id="swotThreatList"></ul>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <p>
+            AI Autonomous Strategic Competitor Tracker
+        </p>
+
+        <span>
+            Autonomous competitor discovery • AI analysis • Strategic intelligence
+        </span>
+
+    </footer>
+
+</div>
+
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
