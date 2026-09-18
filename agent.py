@@ -50,6 +50,7 @@ OFFICIAL_COMPETITOR_SOURCES = {
     "Zomato": "https://www.zomato.com",
     "Blinkit": "https://blinkit.com",
     "Zepto": "https://www.zepto.com",
+    "Instamart": "https://www.swiggy.com/instamart",
     "PhonePe": "https://www.phonepe.com",
     "Paytm": "https://paytm.com",
     "Razorpay": "https://razorpay.com",
@@ -465,15 +466,22 @@ def research_competitor(
                 response.raise_for_status()
                 soup = BeautifulSoup(response.text, "html.parser")
                 title = clean_text(soup.title.get_text(" ", strip=True) if soup.title else name)
-                description_tag = soup.select_one('meta[name="description"]')
-                description = clean_text(
-                    description_tag.get("content", "") if description_tag else ""
-                )
+                metadata = []
+                for tag in soup.select(
+                    'meta[name="description"], '
+                    'meta[property="og:description"], '
+                    'meta[name="keywords"]'
+                ):
+                    metadata.append(clean_text(tag.get("content", "")))
+                for tag in soup.select('script[type="application/ld+json"]'):
+                    metadata.append(clean_text(tag.get_text(" ", strip=True)))
                 page_text = clean_text(soup.get_text(" ", strip=True))
                 combined = [{
                     "title": title,
                     "url": official_url,
-                    "snippet": description or page_text[:600]
+                    "snippet": clean_text(
+                        f"{' '.join(metadata)} {page_text[:4000]}"
+                    )
                 }]
             except requests.RequestException:
                 combined = []
@@ -499,7 +507,9 @@ def research_competitor(
             "launch",
             "launched",
             "new product",
-            "introduced"
+            "introduced",
+            "new offering",
+            "new feature"
         ],
 
         "Technology": [
@@ -507,14 +517,20 @@ def research_competitor(
             "artificial intelligence",
             "technology",
             "automation",
-            "machine learning"
+            "machine learning",
+            "mobile app",
+            "digital platform",
+            "online platform"
         ],
 
         "Expansion": [
             "expansion",
             "expand",
             "new city",
-            "new market"
+            "new market",
+            "across india",
+            "nationwide",
+            "available in"
         ],
 
         "Offers / Pricing": [
@@ -523,7 +539,9 @@ def research_competitor(
             "price",
             "pricing",
             "sale",
-            "cashback"
+            "cashback",
+            "membership",
+            "free delivery"
         ],
 
         "Partnership": [
@@ -537,7 +555,9 @@ def research_competitor(
             "personalization",
             "personalized",
             "support",
-            "experience"
+            "experience",
+            "convenience",
+            "delivery"
         ]
     }
 
