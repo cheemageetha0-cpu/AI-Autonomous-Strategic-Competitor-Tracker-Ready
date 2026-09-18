@@ -22,6 +22,14 @@ GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
 WEB_RESEARCH_ENABLED = os.getenv("WEB_RESEARCH_ENABLED", "false").strip().lower() == "true"
 
+OFFICIAL_COMPETITOR_SOURCES = {
+    "Unacademy": "https://unacademy.com",
+    "upGrad": "https://www.upgrad.com",
+    "Vedantu": "https://www.vedantu.com",
+    "Physics Wallah": "https://www.pw.live",
+    "Coursera": "https://www.coursera.org",
+}
+
 gemini_client = None
 
 if GEMINI_API_KEY:
@@ -414,6 +422,31 @@ def research_competitor(
 
     combined = results + development_results
 
+    if not combined and WEB_RESEARCH_ENABLED:
+        official_url = OFFICIAL_COMPETITOR_SOURCES.get(name)
+        if official_url:
+            try:
+                response = requests.get(
+                    official_url,
+                    headers=HEADERS,
+                    timeout=12
+                )
+                response.raise_for_status()
+                soup = BeautifulSoup(response.text, "html.parser")
+                title = clean_text(soup.title.get_text(" ", strip=True) if soup.title else name)
+                description_tag = soup.select_one('meta[name="description"]')
+                description = clean_text(
+                    description_tag.get("content", "") if description_tag else ""
+                )
+                page_text = clean_text(soup.get_text(" ", strip=True))
+                combined = [{
+                    "title": title,
+                    "url": official_url,
+                    "snippet": description or page_text[:600]
+                }]
+            except requests.RequestException:
+                combined = []
+
     text_parts = []
 
     for item in combined:
@@ -681,31 +714,41 @@ Use exactly this structure:
 # STRATEGIC SCORES
 # ============================================================
 
+SIGNAL_WEIGHTS = {
+    "Technology": 22,
+    "New Product / Launch": 18,
+    "Expansion": 15,
+    "Customer Experience": 13,
+    "Partnership": 10,
+    "Offers / Pricing": 8,
+    "Market Presence": 7,
+    "Customer Focus": 7,
+}
+
 def calculate_score(
     signals,
     research_count,
     is_target=False
 ):
+    """Calculate a reproducible 0-100 score from one competitor's evidence."""
+    observed_signals = {
+        clean_text(signal)
+        for signal in signals or []
+        if clean_text(signal)
+    }
 
-    base = 55
-
-    base += min(
-        len(signals) * 5,
-        25
+    score = sum(
+        SIGNAL_WEIGHTS.get(signal, 0)
+        for signal in observed_signals
     )
 
-    base += min(
-        research_count * 2,
-        15
-    )
+    # Research volume is evidence confidence, not a replacement for signals.
+    score += min(max(int(research_count or 0), 0) * 2, 10)
 
     if is_target:
-        base -= 8
+        score -= 8
 
-    return max(
-        35,
-        min(95, base)
-    )
+    return max(0, min(100, score))
 
 
 def threat_level(score):

@@ -273,7 +273,7 @@ function renderSummary(data) {
 
     setText(
         "strategicScore",
-        `${score.toFixed(1)}/10`
+        `${score.toFixed(1)}/100`
     );
 
 
@@ -498,7 +498,7 @@ function renderCompetitors(data) {
                                 </span>
 
                                 <strong>
-                                    ${score.toFixed(1)}/10
+                                    ${score.toFixed(1)}/100
                                 </strong>
 
                             </div>
@@ -510,7 +510,7 @@ function renderCompetitors(data) {
                                         0,
                                         Math.min(
                                             100,
-                                            score * 10
+                                            score
                                         )
                                     )}%;
                                 "></div>
