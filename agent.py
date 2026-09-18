@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import logging
 from io import BytesIO
 from datetime import datetime
 from urllib.parse import quote_plus, urlparse
@@ -20,14 +21,44 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
-WEB_RESEARCH_ENABLED = os.getenv("WEB_RESEARCH_ENABLED", "false").strip().lower() == "true"
+WEB_RESEARCH_ENABLED = os.getenv(
+    "WEB_RESEARCH_ENABLED",
+    "true" if os.getenv("VERCEL") else "false"
+).strip().lower() == "true"
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+logger.info(
+    "research_config web_research_enabled=%s vercel=%s",
+    WEB_RESEARCH_ENABLED,
+    bool(os.getenv("VERCEL"))
+)
 
 OFFICIAL_COMPETITOR_SOURCES = {
+    "Amazon India": "https://www.amazon.in",
+    "Amazon": "https://www.amazon.in",
+    "Flipkart": "https://www.flipkart.com",
+    "Meesho": "https://www.meesho.com",
+    "Myntra": "https://www.myntra.com",
+    "AJIO": "https://www.ajio.com",
     "Unacademy": "https://unacademy.com",
     "upGrad": "https://www.upgrad.com",
     "Vedantu": "https://www.vedantu.com",
     "Physics Wallah": "https://www.pw.live",
     "Coursera": "https://www.coursera.org",
+    "Swiggy": "https://www.swiggy.com",
+    "Zomato": "https://www.zomato.com",
+    "Blinkit": "https://blinkit.com",
+    "Zepto": "https://www.zepto.com",
+    "PhonePe": "https://www.phonepe.com",
+    "Paytm": "https://paytm.com",
+    "Razorpay": "https://razorpay.com",
+    "Google Pay": "https://pay.google.com",
+    "Microsoft": "https://www.microsoft.com",
+    "Google": "https://www.google.com",
+    "Salesforce": "https://www.salesforce.com",
+    "Oracle": "https://www.oracle.com",
+    "Adobe": "https://www.adobe.com",
 }
 
 gemini_client = None
@@ -519,10 +550,14 @@ def research_competitor(
             signals.append(category)
 
     if not signals:
-        signals = [
-            "Market Presence",
-            "Customer Focus"
-        ]
+        signals = []
+
+    logger.info(
+        "competitor_research name=%s results=%d signals=%s",
+        name,
+        len(combined),
+        signals
+    )
 
     return {
         "name": name,
@@ -936,6 +971,14 @@ def analyze_business(
         score = calculate_score(
             data["signals"],
             len(data["research"])
+        )
+
+        logger.info(
+            "competitor_score name=%s results=%d signals=%s score=%d",
+            data["name"],
+            len(data["research"]),
+            data["signals"],
+            score
         )
 
         data["strategic_score"] = score
